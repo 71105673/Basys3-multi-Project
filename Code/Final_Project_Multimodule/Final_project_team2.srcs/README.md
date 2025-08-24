@@ -17,49 +17,104 @@
 - `UART_RX`: PC로부터 데이터를 수신
 - `UART_TX`: FPGA에서 데이터를 송신 (테스트용)
 - `UART_FIFO`: 수신 데이터를 저장하는 FIFO 버퍼
-- `CMD_PROCESSOR`: FIFO에서 데이터를 읽어 명령을 해석하고 제어 신호로 변환
-- `command_to_btn`: 명령에 대응하는 버튼 시그널 출력 (run, clear, hour, min, sec)
+- `command_to_btn`: 명령에 대응하는 버튼 시그널 출력 (run, clear, hour, min, sec, Mode 등..)
 - `watch`, `stopwatch`: 실시간 시계 및 스톱워치 동작 담당
+-  `DHT11`, `SR04`: 온습도 및 거리 측정 센서를 담당
 
 ## B📡 Supported Commands (via UART)
 | Command | 기능          | 출력 신호 |
 |---------|---------------|-----------|
-| R       | 스톱워치 시작 | run       |
+| R       | 스톱워치 시작   | run       |
+| S       | 스톱워치 정지   | Stop      |
 | C       | 스톱워치 초기화 | clear     |
-| H       | 시 설정       | hour      |
-| M       | 분 설정       | min       |
-| S       | 초 설정       | sec       |
+| U       | 값 UP         |   u        |
+| D       | 값 Down       |  d         |
+| L       | 시분초 설정    | L      |
+| ESC     | reset         | ESC       |
+| M,N    | 모드 전환(DHT11, SRo4, 시계, 스탑워치)|  N,M |
 
 각 명령은 ASCII 코드로 입력됩니다. (R = 0x52, C = 0x43, ...)
 
 ## 🖼️ Block Diagram
-```
-[ PC Terminal ]
-      |
-      v
-[ UART_RX ] --> [ UART_FIFO ] --> [ CMD_PROCESSOR ] --> [ Watch / Stopwatch ]
-                                                    --> [ 7-Segment Display ]
-```
+![alt text](../../../photo/final_basys/image.png)
 
-## 🧪 Simulation
-Vivado 시뮬레이션을 통해 각 명령에 대한 동작을 검증하였습니다.
-각 명령어(R, C, H, M, S)에 대해 FIFO에서 데이터를 읽고, 해당 기능이 정상 동작함을 파형으로 확인했습니다.
 
 ## 🧹 개선 사항
-초기 버전에서 FIFO가 empty 상태여도 이전 데이터를 읽는 오류가 발생
-개선 후: empty 신호 확인 후에만 읽기 동작 수행 → 잘못된 명령 실행 방지
+초기 버전에서 SetUp Time Violation 발생
+1. SR04 및 DHT11 Sender 에서 너무 많은 case문을 사용  
+2. counter에서 큰 숫자를 %58 연산 사용
 
-## 📁 File Structure
 ```
-├── uart_rx.v
-├── uart_tx.v
-├── uart_controller.v
-├── btn_debounce.v
-├── stopwatch.v (real, stopwatch 의 control unit, datapath 포함)
-├── fnd_controller.v
-├── command_to_btn.v
-└── top_module.v
+DONE: begin
+    dist_next = duration_reg / 58;
+    done_next = 1;
+    next_state = IDLE;
+end
 ```
 
-🎥 Demo
-프로젝트의 동작 영상은 PPT에 첨부된 데모 영상을 참고하세요.
+개선 후: 
+```
+DIVIDE: begin
+    // shift-and-subtract divider for division by 58
+    if (dividend_reg >= 58) begin
+        dividend_next = dividend_reg - 58;
+        quotient_next = quotient_reg + 1;
+    end else begin
+        state_next = DONE;
+    end
+end
+```
+case 문을 if문을 수정하여 더 빠르게 수정
+```
+PREPARE: begin
+    if (!prepare_done) begin
+        if (btn_sender_up) begin
+            message_buffer[0]  = "T";
+            message_buffer[1]  = "e";
+            message_buffer[2]  = "m";
+            message_buffer[3]  = "p";
+            message_buffer[4]  = ":";
+            message_buffer[5]  = " ";
+            message_buffer[6]  = temp_ascii[0];
+            message_buffer[7]  = temp_ascii[1];
+            message_buffer[8]  = "'";
+            message_buffer[9]  = "C";
+            message_buffer[10] = ",";
+            message_buffer[11] = " ";
+            message_buffer[12] = "H";
+            message_buffer[13] = "u";
+            message_buffer[14] = "m";
+            message_buffer[15] = "i";
+            message_buffer[16] = "d";
+            message_buffer[17] = ":";
+            message_buffer[18] = " ";
+            message_buffer[19] = humi_ascii[0];
+            message_buffer[20] = humi_ascii[1];
+            message_buffer[21] = "%";
+            message_buffer[22] = "\n";
+            msg_len_reg = 23;
+        end else begin
+            message_buffer[0]  = "D";
+            message_buffer[1]  = "i";
+            message_buffer[2]  = "s";
+            message_buffer[3]  = "t";
+            message_buffer[4]  = "a";
+            message_buffer[5]  = "n";
+            message_buffer[6]  = "c";
+            message_buffer[7]  = "e";
+            message_buffer[8]  = ":";
+            message_buffer[9]  = w_send_dist_data[31:24];
+            message_buffer[10] = w_send_dist_data[23:16];
+            message_buffer[11] = w_send_dist_data[15:8];
+            message_buffer[12] = w_send_dist_data[7:0];
+            message_buffer[13] = "c";
+            message_buffer[14] = "m";
+            message_buffer[15] = "\n";
+            msg_len_reg = 16;
+        end
+        prepare_done_next = 1;
+    end else begin
+        next_state = LOAD;
+    end
+end
+```
