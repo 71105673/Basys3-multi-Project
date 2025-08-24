@@ -1,4 +1,4 @@
-# UART Watch & Stopwatch System on FPGA
+# UART-Controled Sensor & Watch / Stopwatch System on FPGA
 ## 📝 Overview
 본 프로젝트는 **Basys-3 기반 SW 및 Buttonㅇ으로 디지털 시계 및 스톱워치 기능을 제어**하는 FPGA 시스템입니다.
 명령은 버튼 및 스위치를 통해 안정적으로 처리되며, Verilog로 구현된 여러 모듈들이 유기적으로 동작하여 시계 모드와 스톱워치 모드를 전환 및 제어합니다.
