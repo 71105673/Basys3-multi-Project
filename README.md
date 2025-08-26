@@ -23,6 +23,7 @@ Each project demonstrates different digital design concepts, ranging from simple
 ### ⏱️ UART Stopwatch (UART_Stopwatch_final)
 - Stopwatch system with **UART communication** support.  
 - Transmits timing data via serial interface.  
+- Watch-StopWatch + UART
 
 ### 🔄 UART FIFO Loopback
 - Implements a UART **FIFO-based loopback system**.  
@@ -45,3 +46,4 @@ Each project demonstrates different digital design concepts, ranging from simple
 A PPT presentation is available for **UART-Stopwatch** and **Final_Project_Multimodule**
 - **UART-Stopwatch**: `UCH_uart_watch_통신_영상X.pdf`
 - **Final_Project_Multimodule**: `2조_Final.pdf`
+
