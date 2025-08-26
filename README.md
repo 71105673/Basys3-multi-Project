@@ -5,19 +5,20 @@ Each project demonstrates different digital design concepts, ranging from simple
 
 ---
 
-## 📂 Project List
+## 📂 Project List 
 
 ### 🔢 10000 Counter
 - Implements a counter that counts up to 10,000.  
 - Demonstrates basic sequential logic design.  
 
-### 🌡️ DHT11 / DHT11_UCH
+### 🌡️ DHT11
 - Interface with the **DHT11 temperature & humidity sensor**.  
-- Includes source files (`.srcs`) for integration.  
+- Measures temperature and displays the result on Basys-3.
 
 ### ⏱️ Watch-StopWatch
 - A simple stopwatch system implemented on Basys-3.  
 - Features start, stop, and reset functionalities.  
+- Includes a clock feature that allows setting hours, minutes, and seconds.
 
 ### ⏱️ UART Stopwatch (UART_Stopwatch_final)
 - Stopwatch system with **UART communication** support.  
@@ -38,3 +39,9 @@ Each project demonstrates different digital design concepts, ranging from simple
 ### 🏗️ Final Project – Multimodule
 - The **capstone project** combining multiple modules into a final integrated system.  
 - Showcases modular design and complex system integration.  
+
+
+## PPT
+A PPT presentation is available for **UART-Stopwatch** and **Final_Project_Multimodule**
+- **UART-Stopwatch**: `UCH_uart_watch_통신_영상X.pdf`
+- **Final_Project_Multimodule**: `2조_Final.pdf`

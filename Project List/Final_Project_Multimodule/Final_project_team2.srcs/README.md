@@ -36,7 +36,7 @@
 각 명령은 ASCII 코드로 입력됩니다. (R = 0x52, C = 0x43, ...)
 
 ## 🖼️ Block Diagram
-![alt text](../../../photo/final_basys/image.png)
+![alt text](immage/image.png)
 
 
 ## 🧹 개선 사항
